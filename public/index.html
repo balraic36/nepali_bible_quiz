@@ -25,7 +25,7 @@
       --good-soft:rgba(13,150,105,.2);--bad-soft:rgba(220,38,38,.18);
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
+    html,body{margin:0;padding:0; height:100%; overflow-x:hidden;}
     body{
       font-family:'Bricolage Grotesque',sans-serif;color:var(--text);
       background:
@@ -33,6 +33,7 @@
         radial-gradient(700px 400px at 110% 10%,var(--accent2-soft),transparent 55%),
         var(--bg);
       min-height:100vh;
+      display: flex; flex-direction: column;
       transition:background .3s ease, color .3s ease;
     }
     .serif{font-family:'Fraunces',serif}
@@ -41,245 +42,189 @@
       box-shadow:0 10px 30px -15px rgba(139,92,246,.25), 0 4px 12px rgba(0,0,0,.05);
       transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     }
-    .card:hover{transform:translateY(-2px)}
     .btn{
-      padding:12px 20px;border-radius:14px;font-weight:700;border:none;cursor:pointer;
-      transition:all .15s ease;letter-spacing:.01em;font-family:inherit;font-size:15px;
+      padding:16px 24px !important;border-radius:14px;font-weight:800 !important;border:none;cursor:pointer;
+      transition:all .15s ease;letter-spacing:.01em;font-family:inherit;font-size:1.2rem !important;
     }
-    .btn:hover:not(:disabled){transform:translateY(-2px)}
-    .btn:active:not(:disabled){transform:translateY(0)}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
     .btn-primary{background:linear-gradient(135deg,var(--accent),#6d28d9);color:#fff;box-shadow:0 8px 20px -6px rgba(139,92,246,.55)}
     .btn-accent2{background:linear-gradient(135deg,var(--accent2),#be185d);color:#fff;box-shadow:0 8px 20px -6px rgba(224,62,107,.5)}
     .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
     .btn-good{background:var(--good);color:#fff;box-shadow:0 6px 16px -6px rgba(13,150,105,.5)}
+    
+    /* मोबाइलको लागि सबै कुरा ठूलो र प्रस्ट बनाइएको छ */
     .chip{
-      display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;
-      font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--card);
+      display:inline-flex;align-items:center;gap:6px;padding:8px 14px !important;border-radius:999px;
+      font-size:1rem !important;font-weight:700 !important;border:1px solid var(--border);background:var(--card);
     }
     .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
     .opt{
-      width:100%;text-align:left;padding:14px 16px;border-radius:14px;cursor:pointer;
-      background:var(--card);border:2px solid var(--border);font-family:inherit;font-size:15px;
-      color:var(--text);font-weight:500;transition:all .15s ease;display:flex;align-items:center;gap:12px;
+      width:100%;text-align:left;padding:18px 20px !important;border-radius:16px;cursor:pointer;
+      background:var(--card);border:2px solid var(--border);font-family:inherit;
+      font-size:1.3rem !important; /* अक्षर ठूलो */
+      color:var(--text);font-weight:700 !important; /* अक्षर मोटो */
+      transition:all .15s ease;display:flex;align-items:center;gap:15px; margin-bottom:8px;
     }
-    .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft);transform:translateX(3px)}
-    .opt:disabled{cursor:not-allowed}
     .opt .letter{
-      width:30px;height:30px;border-radius:10px;background:var(--accent-soft);color:var(--accent);
-      display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-size:13px;
+      width:38px !important;height:38px !important;border-radius:12px;background:var(--accent-soft);color:var(--accent);
+      display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-size:1.2rem !important;
     }
     .opt.correct{border-color:var(--good);background:var(--good-soft);color:var(--good)}
     .opt.correct .letter{background:var(--good);color:#fff}
     .opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
     .opt.wrong .letter{background:var(--bad);color:#fff}
     .opt.eliminated{opacity:.35;pointer-events:none}
-    .progress{height:10px;background:rgba(139,92,246,.12);border-radius:99px;overflow:hidden}
-    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
-    .timer-bar{height:6px;background:rgba(139,92,246,.15);border-radius:99px;overflow:hidden;margin-top:10px}
-    .timer-bar > div{height:100%;background:linear-gradient(90deg,var(--good),#f59e0b,var(--bad));transition:width .25s linear;width:100%}
+    
     .life{
-      padding:8px 10px;border-radius:12px;background:var(--card);border:1px solid var(--border);
-      cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;
-      transition:all .15s ease;color:var(--text);font-family:inherit;
+      padding:12px 16px !important;border-radius:14px;background:var(--card);border:2px solid var(--border);
+      cursor:pointer;font-size:1.1rem !important;font-weight:800 !important;display:flex;align-items:center;gap:6px;
+      transition:all .15s ease;color:var(--text);font-family:inherit; flex:1; justify-content:center;
     }
     .life:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
     .life:disabled{opacity:.4;cursor:not-allowed}
-    .streak{
-      background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;background-clip:text;color:transparent;
-      font-weight:800;
-    }
-    .xp-pop{
-      position:fixed;pointer-events:none;font-weight:800;font-size:28px;z-index:50;
-      color:var(--accent);animation:xp 1s ease-out forwards;
-    }
+    
+    /* स्क्रिनलाई पूरा ढाक्ने सेटिङ */
+    .hidden-force { display: none !important; }
+    #appWrapper { flex: 1; display: flex; flex-direction: column; width: 100%; }
+    .main-container { flex: 1; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto; width: 100%; padding: 15px; }
+    #quiz { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    #qCard { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 25px 20px; }
+    
+    #qText { font-size: 1.8rem !important; font-weight: 800 !important; line-height: 1.4 !important; }
+    
+    .progress{height:12px;background:rgba(139,92,246,.12);border-radius:99px;overflow:hidden}
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease}
+    .timer-bar{height:10px;background:rgba(139,92,246,.15);border-radius:99px;overflow:hidden;margin-top:10px}
+    .timer-bar > div{height:100%;background:linear-gradient(90deg,var(--good),#f59e0b,var(--bad));transition:width .25s linear;width:100%}
+    
+    .xp-pop{ position:fixed;pointer-events:none;font-weight:800;font-size:32px;z-index:50; color:var(--accent);animation:xp 1s ease-out forwards; }
     @keyframes xp{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}30%{transform:translate(-50%,-90%) scale(1.2);opacity:1}100%{transform:translate(-50%,-180%) scale(1);opacity:0}}
+    .fade-in{animation:fadeIn .35s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .shake{animation:shake .35s ease}
     @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
     .pulse{animation:pulse .45s ease}
-    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
-    .fade-in{animation:fadeIn .35s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    .badge{
-      display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:14px;
-      font-size:22px;background:linear-gradient(135deg,var(--accent-soft),var(--accent2-soft));border:1px solid var(--border);
-    }
-    .badge.locked{filter:grayscale(1) opacity(.35)}
-    .modal-bg{
-      position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);
-      display:flex;align-items:center;justify-content:center;z-index:40;padding:20px;animation:fadeIn .25s ease;
-    }
-    .modal{
-      background:var(--card);border-radius:24px;padding:28px;max-width:460px;width:100%;
-      box-shadow:0 30px 60px -15px rgba(0,0,0,.4);animation:popIn .35s cubic-bezier(.2,1.4,.4,1);
-      border:1px solid var(--border);
-    }
-    @keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-    .stat-box{
-      padding:14px;border-radius:14px;background:var(--accent-soft);text-align:center;border:1px solid var(--border);
-    }
-    input[type="text"]{
-      width:100%;padding:14px 16px;border-radius:14px;border:2px solid var(--border);background:var(--card);
-      color:var(--text);font-family:inherit;font-size:16px;outline:none;transition:border-color .15s ease;
-    }
-    input[type="text"]:focus{border-color:var(--accent)}
-    .tab{padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);transition:all .15s ease}
-    .tab.active{background:var(--accent);color:#fff}
-    .tab:hover:not(.active){color:var(--text);background:var(--accent-soft)}
-    .verse{font-family:'Fraunces',serif;font-style:italic;color:var(--muted);font-size:14px;line-height:1.6;border-left:3px solid var(--accent);padding-left:12px;margin-top:10px}
-    #loadingScreen { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; }
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    
+    #loadingScreen { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; width: 100%; position: absolute; top:0; left:0; background: var(--bg); z-index: 100; }
   `;
   document.head.appendChild(s);
 })();
 </script>
 </head>
-<body style="background-color:transparent;box-sizing:border-box;">
+<body>
 
 <!-- LOADING SCREEN -->
 <div id="loadingScreen">
-  <div class="text-4xl mb-4 pulse">📖</div>
-  <h2 class="text-2xl font-bold">सर्भरबाट प्रश्नहरू ल्याउँदै...</h2>
-  <p class="text-sm mt-2" style="color:var(--muted)">कृपया एकैछिन पर्खनुहोस्</p>
+  <div class="text-6xl mb-4 pulse">📖</div>
+  <h2 class="text-3xl font-extrabold text-center">प्रश्नहरू लोड हुँदैछ...</h2>
+  <p class="text-lg mt-2 font-semibold" style="color:var(--muted)">कृपया एकैछिन पर्खनुहोस्</p>
 </div>
 
 <!-- APP WRAPPER -->
-<div id="appWrapper" class="hidden">
-<div class="max-w-4xl mx-auto px-4 py-6">
+<div id="appWrapper" class="hidden-force">
+<div class="main-container">
 
   <!-- Header -->
   <div class="flex items-center justify-between mb-5">
     <div>
-      <h1 class="text-3xl sm:text-4xl font-extrabold" style="background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em">
-        ✨ Bible Quiz Saga
+      <h1 class="text-4xl font-extrabold" style="background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em">
+        ✨ Bible Quiz
       </h1>
-      <p class="text-xs mt-1" style="color:var(--muted)">Test your knowledge across 6 epic game modes</p>
     </div>
     <div class="flex items-center gap-2">
       <div class="chip" title="Total XP">⭐ <span id="xp">0</span></div>
       <div class="chip" title="Level">🏅 Lv.<span id="plvl">1</span></div>
-      <button id="themeBtn" class="btn btn-ghost" style="padding:8px 12px">🌙</button>
+      <button id="themeBtn" class="btn btn-ghost" style="padding:10px 14px !important; font-size:1.2rem !important;">🌙</button>
     </div>
   </div>
 
   <!-- MAIN MENU -->
-  <div id="menu">
-    <div class="grid sm:grid-cols-2 gap-4 mb-5">
-      <div class="card p-5 cursor-pointer" data-mode="classic">
-        <div class="text-3xl mb-2">📖</div>
-        <h3 class="text-lg font-bold">Classic Mode</h3>
-        <p class="text-sm mt-1" style="color:var(--muted)">10 questions. Normal pace.</p>
+  <div id="menu" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+      <div class="card p-6 cursor-pointer" data-mode="classic">
+        <div class="text-4xl mb-3">📖</div>
+        <h3 class="text-2xl font-extrabold mb-1">क्लासिक मोड</h3>
+        <p class="text-base font-semibold" style="color:var(--muted)">१० प्रश्नहरू। सामान्य गति।</p>
       </div>
-      <div class="card p-5 cursor-pointer" data-mode="timed">
-        <div class="text-3xl mb-2">⏱️</div>
-        <h3 class="text-lg font-bold">Lightning Round</h3>
-        <p class="text-sm mt-1" style="color:var(--muted)">15 seconds per question. Think fast!</p>
+      <div class="card p-6 cursor-pointer" data-mode="timed">
+        <div class="text-4xl mb-3">⏱️</div>
+        <h3 class="text-2xl font-extrabold mb-1">टाइमर मोड</h3>
+        <p class="text-base font-semibold" style="color:var(--muted)">हरेक प्रश्नको लागि १५ सेकेन्ड।</p>
       </div>
-      <div class="card p-5 cursor-pointer" data-mode="survival">
-        <div class="text-3xl mb-2">❤️</div>
-        <h3 class="text-lg font-bold">Survival</h3>
-        <p class="text-sm mt-1" style="color:var(--muted)">3 lives. One wrong answer and you lose a life.</p>
+      <div class="card p-6 cursor-pointer" data-mode="survival">
+        <div class="text-4xl mb-3">❤️</div>
+        <h3 class="text-2xl font-extrabold mb-1">सर्भाइभल मोड</h3>
+        <p class="text-base font-semibold" style="color:var(--muted)">३ वटा लाइफ। गल्ती गरे बाहिर।</p>
       </div>
-      <div class="card p-5 cursor-pointer" data-mode="marathon">
-        <div class="text-3xl mb-2">🏃</div>
-        <h3 class="text-lg font-bold">Endless Marathon</h3>
-        <p class="text-sm mt-1" style="color:var(--muted)">Unlimited questions. How high can you score?</p>
-      </div>
-      <div class="card p-5 cursor-pointer hidden" data-mode="fill">
-        <!-- Hidden fill mode as excel doesn't support fillblank logic natively yet -->
-      </div>
-      <div class="card p-5 cursor-pointer" data-mode="hotseat">
-        <div class="text-3xl mb-2">👥</div>
-        <h3 class="text-lg font-bold">2-Player Hotseat</h3>
-        <p class="text-sm mt-1" style="color:var(--muted)">Pass-and-play. 5 rounds each. Who wins?</p>
+      <div class="card p-6 cursor-pointer" data-mode="marathon">
+        <div class="text-4xl mb-3">🏃</div>
+        <h3 class="text-2xl font-extrabold mb-1">म्याराथन</h3>
+        <p class="text-base font-semibold" style="color:var(--muted)">लगातार खेल। उच्चतम अङ्कको लागि।</p>
       </div>
     </div>
 
-    <div class="card p-5 mb-5 hidden">
-      <h3 class="font-bold mb-3">⚙️ Setup</h3>
-      <div class="mb-3">
-        <p class="text-xs font-semibold mb-2" style="color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Category</p>
-        <div class="flex flex-wrap gap-2" id="cats"></div>
-      </div>
-      <div>
-        <p class="text-xs font-semibold mb-2" style="color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Difficulty</p>
-        <div class="flex flex-wrap gap-2" id="diffs"></div>
-      </div>
-    </div>
-
-    <div class="grid sm:grid-cols-3 gap-3">
-      <button id="statsBtn" class="btn btn-ghost">📊 Statistics</button>
-      <button id="badgesBtn" class="btn btn-ghost">🏆 Achievements</button>
-      <button id="dailyBtn" class="btn btn-accent2">🌟 Daily Challenge</button>
+    <div class="grid grid-cols-2 gap-3 mt-4">
+      <button id="statsBtn" class="btn btn-ghost">📊 तथ्याङ्क</button>
+      <button id="badgesBtn" class="btn btn-ghost">🏆 ब्याजहरू</button>
     </div>
   </div>
 
   <!-- QUIZ AREA -->
-  <div id="quiz" class="hidden">
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+  <div id="quiz" class="hidden-force">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
       <div class="flex items-center gap-2">
         <span class="chip" id="modeChip">📖 Classic</span>
-        <span class="chip" id="diffChip">All Questions</span>
       </div>
       <div class="flex items-center gap-2">
         <span class="chip">Q <span id="qNum">1</span>/<span id="qTot">10</span></span>
         <span class="chip">💯 <span id="score">0</span></span>
-        <span class="chip streak" id="streakChip" style="display:none">🔥 <span id="streak">0</span></span>
         <span class="chip" id="livesChip" style="display:none">❤️ <span id="lives">3</span></span>
-        <span class="chip" id="turnChip" style="display:none">🎯 P<span id="turn">1</span></span>
       </div>
     </div>
 
-    <div class="progress mb-4"><div id="qProg" style="width:10%"></div></div>
-    <div class="timer-bar" id="timerWrap" style="display:none"><div id="timer"></div></div>
+    <div class="progress mb-2"><div id="qProg" style="width:10%"></div></div>
+    <div class="timer-bar" id="timerWrap" style="display:none; margin-bottom: 15px;"><div id="timer"></div></div>
 
-    <div class="card p-6 mb-4 fade-in" id="qCard">
-      <p class="text-xs font-semibold mb-2" style="color:var(--accent);letter-spacing:.1em;text-transform:uppercase" id="qCat">Bible Trivia</p>
-      <h2 class="serif text-xl sm:text-2xl font-semibold leading-relaxed mb-5" id="qText">Loading question...</h2>
+    <!-- Question Card -->
+    <div class="card fade-in" id="qCard">
+      <h2 class="serif mb-6" id="qText">लोड हुँदैछ...</h2>
       <div id="opts" class="grid gap-3"></div>
-      <div id="fillWrap" class="hidden">
-        <input type="text" id="fillInput" placeholder="Type the missing word..." autocomplete="off">
-        <div class="flex gap-2 mt-3">
-          <button class="btn btn-primary flex-1" id="fillSubmit">Submit Answer</button>
-          <button class="btn btn-ghost" id="fillSkip">Skip</button>
-        </div>
-      </div>
-      <div id="feedback" class="hidden mt-5 pt-4" style="border-top:1px solid var(--border)">
-        <p class="font-bold text-lg" id="fbText"></p>
-        <p class="verse" id="fbVerse"></p>
+      
+      <div id="feedback" class="hidden-force mt-5 pt-4" style="border-top:2px solid var(--border)">
+        <p class="font-extrabold text-2xl" id="fbText"></p>
+        <p class="verse text-lg font-bold mt-2" id="fbVerse"></p>
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-2 mb-4" id="lifelines">
+    <!-- Lifelines -->
+    <div class="flex gap-2 my-4" id="lifelines">
       <button class="life" data-life="fifty">🎯 50/50</button>
       <button class="life" data-life="hint">💡 Hint</button>
       <button class="life" data-life="skip">⏭️ Skip</button>
-      <button class="life" data-life="audience">👥 Audience</button>
     </div>
 
-    <div class="flex justify-between">
-      <button id="quitBtn" class="btn btn-ghost">← Quit</button>
-      <button id="nextBtn" class="btn btn-primary hidden">Next →</button>
+    <div class="flex justify-between mt-2">
+      <button id="quitBtn" class="btn btn-ghost px-6 py-3 text-lg font-bold">← पछाडि</button>
+      <button id="nextBtn" class="btn btn-primary px-8 py-3 text-lg font-bold hidden-force">अर्को →</button>
     </div>
   </div>
 
   <!-- RESULTS -->
-  <div id="results" class="hidden"></div>
+  <div id="results" class="hidden-force"></div>
 
   <!-- STATS -->
-  <div id="statsView" class="hidden"></div>
+  <div id="statsView" class="hidden-force"></div>
 
   <!-- BADGES -->
-  <div id="badgesView" class="hidden"></div>
+  <div id="badgesView" class="hidden-force"></div>
 
-  <p class="text-center text-xs mt-8" style="color:var(--muted)">🕊️ "Thy word is a lamp unto my feet, and a light unto my path." — Psalm 119:105</p>
 </div>
-<div id="modalRoot"></div>
 </div>
 
 <script>
 (async function(){
   // ============================================================
-  // 📚 FETCH BIBLE QUESTIONS FROM GITHUB EXCEL/CSV via SERVER API
+  // 📚 FETCH QUESTIONS
   // ============================================================
   let Q = { all: [] };
   
@@ -289,8 +234,9 @@
       
       if(data && data.length > 0) {
           Q.all = data;
-          document.getElementById('loadingScreen').classList.add('hidden');
-          document.getElementById('appWrapper').classList.remove('hidden');
+          // LOADER HIDE & SHOW APP (Fixed forcefully)
+          document.getElementById('loadingScreen').style.display = 'none';
+          document.getElementById('appWrapper').classList.remove('hidden-force');
       } else {
           alert("कुनै प्रश्न भेटिएन। कृपया एक्सेल फाइल चेक गर्नुहोस्!");
       }
@@ -299,55 +245,41 @@
       console.error(err);
   }
 
-  // Categories & Difficulties simplified since we fetch all from one source
-  const CATS = { all:{name:"All Questions",icon:"📜"} };
   const DIFFS = { medium:{name:"Normal",score:20,color:"#f59e0b"} };
 
   const MODES = {
-    classic:{name:"Classic Mode",icon:"📖",questions:10,timed:false,survival:false},
-    timed:{name:"Lightning Round",icon:"⏱️",questions:10,timed:15,survival:false},
-    survival:{name:"Survival",icon:"❤️",questions:999,timed:false,survival:true},
-    marathon:{name:"Endless Marathon",icon:"🏃",questions:999,timed:false,survival:false},
-    hotseat:{name:"2-Player Hotseat",icon:"👥",questions:5,timed:false,survival:false,hotseat:true},
+    classic:{name:"क्लासिक",icon:"📖",questions:10,timed:false,survival:false},
+    timed:{name:"टाइमर",icon:"⏱️",questions:10,timed:15,survival:false},
+    survival:{name:"सर्भाइभल",icon:"❤️",questions:999,timed:false,survival:true},
+    marathon:{name:"म्याराथन",icon:"🏃",questions:999,timed:false,survival:false},
   };
 
   const BADGES = [
-    {id:"first",name:"First Steps",desc:"Complete your first quiz",icon:"🌱",check:s=>s.games>=1},
-    {id:"ten",name:"Faithful",desc:"Play 10 quizzes",icon:"🔟",check:s=>s.games>=10},
-    {id:"fifty",name:"Devoted",desc:"Play 50 quizzes",icon:"🕊️",check:s=>s.games>=50},
-    {id:"streak5",name:"On Fire",desc:"Get a 5-question streak",icon:"🔥",check:s=>s.bestStreak>=5},
-    {id:"streak10",name:"Unstoppable",desc:"Get a 10-question streak",icon:"💥",check:s=>s.bestStreak>=10},
-    {id:"perfect",name:"Flawless",desc:"Score 100% on any quiz",icon:"💯",check:s=>s.perfects>=1},
-    {id:"expert",name:"Scholar",desc:"Reach Level 10",icon:"🎓",check:s=>s.level>=10},
-    {id:"survivor",name:"Survivor",desc:"Beat Survival 15+ in a row",icon:"🛡️",check:s=>s.bestSurvival>=15},
-    {id:"marathoner",name:"Marathoner",desc:"Score 50+ in Marathon",icon:"🏅",check:s=>s.bestMarathon>=50},
-    {id:"sage",name:"Sage of Scripture",desc:"Reach Level 20",icon:"👑",check:s=>s.level>=20},
+    {id:"first",name:"सुरुवात",desc:"पहिलो खेल पूरा गर्नुभयो",icon:"🌱",check:s=>s.games>=1},
+    {id:"ten",name:"विश्वासी",desc:"१० वटा खेल खेल्नुभयो",icon:"🔟",check:s=>s.games>=10},
+    {id:"fifty",name:"समर्पित",desc:"५० खेलहरू पूरा गर्नुभयो",icon:"🕊️",check:s=>s.games>=50},
+    {id:"streak5",name:"लगातार ५",desc:"लगातार ५ सही उत्तर",icon:"🔥",check:s=>s.bestStreak>=5},
+    {id:"perfect",name:"उत्कृष्ट",desc:"१००% सही उत्तर",icon:"💯",check:s=>s.perfects>=1},
+    {id:"expert",name:"विद्वान",desc:"लेभल १० पुग्नुभयो",icon:"🎓",check:s=>s.level>=10},
   ];
 
-  // ============================================================
-  // 🎮 GAME STATE
-  // ============================================================
-  const LS_KEY = "bibleQuizSaga_v1";
+  // GAME STATE
+  const LS_KEY = "bibleQuizSaga_v2";
   let state = Object.assign({
     xp:0, level:1, games:0, totalQ:0, correctQ:0, bestStreak:0, perfects:0,
-    bestSurvival:0, bestMarathon:0, bestDaily:0, loveChapter:false,
-    catMastery:{}, badges:{}, lastDaily:null, dailyDone:false,
-    theme:"light",
+    bestSurvival:0, bestMarathon:0, badges:{}, theme:"light",
   }, JSON.parse(localStorage.getItem(LS_KEY)||"{}"));
 
   let game = null;
-  let selCat = "all", selDiff = "medium", selMode = "classic";
+  let selDiff = "medium", selMode = "classic";
   let timerInt = null;
 
-  // ============================================================
-  // 🎨 UI SETUP
-  // ============================================================
+  // UI SETUP
   const $ = id => document.getElementById(id);
   
   document.querySelectorAll("[data-mode]").forEach(c=>{
     c.onclick = ()=>{ selMode=c.dataset.mode; startGame(); };
   });
-  $("dailyBtn").onclick = ()=>{ selMode="classic"; startGame(true); };
   $("statsBtn").onclick = showStats;
   $("badgesBtn").onclick = showBadges;
   $("themeBtn").onclick = toggleTheme;
@@ -358,53 +290,38 @@
   applyTheme();
   updatePlayerUI();
 
-  // ============================================================
-  // 🚀 START GAME
-  // ============================================================
-  function startGame(daily=false){
+  // START GAME
+  function startGame(){
     const mode = MODES[selMode];
     const diff = DIFFS[selDiff];
-    const qList = buildQuestionList(mode, daily);
+    const qList = buildQuestionList(mode);
     game = {
-      mode, modeKey:selMode, diff, diffKey:selDiff, cat:selCat, daily,
-      qs:qList, idx:0, score:0, streak:0, bestStreak:0, lives:3,
-      turn:1, p1score:0, p2score:0, usedLifes:{fifty:1,hint:2,skip:1,audience:1},
+      mode, diff, qs:qList, idx:0, score:0, streak:0, bestStreak:0, lives:3,
+      usedLifes:{fifty:1,hint:1,skip:1},
       qTot: Math.min(mode.questions, qList.length),
       busy:false, feedback:false, timer:0,
     };
-    if(daily){ game.qTot = 7; game.qs = qList.slice(0,7); }
-    $("menu").classList.add("hidden");
-    $("results").classList.add("hidden");
-    $("statsView").classList.add("hidden");
-    $("badgesView").classList.add("hidden");
-    $("quiz").classList.remove("hidden");
+    $("menu").classList.add("hidden-force");
+    $("results").classList.add("hidden-force");
+    $("statsView").classList.add("hidden-force");
+    $("badgesView").classList.add("hidden-force");
+    $("quiz").classList.remove("hidden-force");
+    
     $("modeChip").textContent = mode.icon+" "+mode.name;
     $("qTot").textContent = game.qTot;
     $("livesChip").style.display = mode.survival?"inline-flex":"none";
-    $("turnChip").style.display = mode.hotseat?"inline-flex":"none";
     $("timerWrap").style.display = mode.timed?"block":"none";
-    $("lifelines").style.display = mode.fillOnly?"none":"flex";
     renderLifelines();
     renderQuestion();
   }
 
-  function buildQuestionList(mode, daily){
+  function buildQuestionList(mode){
     let pool = [...Q.all];
-    
-    // Shuffle
     for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
-    
-    // Deterministic daily
-    if(daily){
-      const seed = new Date().toDateString().split("").reduce((a,c)=>a+c.charCodeAt(0),0);
-      pool = pool.sort((a,b)=> ((a.q.length+seed) % 7) - ((b.q.length+seed) % 7));
-    }
     return pool.slice(0, mode.questions);
   }
 
-  // ============================================================
-  // ❓ RENDER QUESTION
-  // ============================================================
+  // RENDER QUESTION
   function renderQuestion(){
     if(game.idx >= game.qs.length) return endGame();
     const q = game.qs[game.idx];
@@ -412,13 +329,10 @@
     game.busy = false; game.feedback = false;
     $("qNum").textContent = game.idx+1;
     $("score").textContent = game.score;
-    $("streak").textContent = game.streak;
-    $("streakChip").style.display = game.streak>=2 ? "inline-flex":"none";
     $("lives").textContent = game.lives;
-    $("turn").textContent = game.turn;
     $("qProg").style.width = ((game.idx)/game.qTot*100)+"%";
-    $("nextBtn").classList.add("hidden");
-    $("feedback").classList.add("hidden");
+    $("nextBtn").classList.add("hidden-force");
+    $("feedback").classList.add("hidden-force");
     $("qCard").classList.remove("shake","pulse");
     void $("qCard").offsetWidth;
     $("qCard").classList.add("fade-in");
@@ -427,9 +341,7 @@
 
     const optsEl = $("opts");
     optsEl.innerHTML = "";
-    optsEl.classList.remove("hidden");
-
-    // Shuffle options but remember correct index
+    
     const order = q.o.map((_,i)=>i);
     for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
     game.shuffle = order;
@@ -444,7 +356,6 @@
       optsEl.appendChild(b);
     });
 
-    // Timer
     if(game.mode.timed){
       game.timer = game.mode.timed;
       $("timer").style.width = "100%";
@@ -459,9 +370,7 @@
     }
   }
 
-  // ============================================================
-  // ✅ ANSWER HANDLING
-  // ============================================================
+  // ANSWER HANDLING
   function handleAnswer(idx){
     if(game.busy) return;
     game.busy = true; game.feedback = true;
@@ -470,7 +379,6 @@
     const correct = idx === q.a;
 
     const opts = [...document.querySelectorAll(".opt")];
-    
     opts.forEach((b,i)=>{
         b.disabled = true;
         const realIdx = +b.dataset.idx;
@@ -478,27 +386,16 @@
         else if(realIdx===idx && !correct) b.classList.add("wrong");
     });
 
-    if(correct){
-      onCorrect();
-    } else {
-      onWrong();
-    }
+    if(correct) onCorrect(); else onWrong();
     showFeedback(correct);
-    $("nextBtn").classList.remove("hidden");
+    $("nextBtn").classList.remove("hidden-force");
   }
 
   function onCorrect(){
-    const base = game.diff.score;
-    const streakBonus = Math.min(game.streak, 10) * 2;
-    const diffMul = 1;
-    const timeBonus = game.mode.timed ? Math.max(0, Math.floor(game.timer*2)) : 0;
-    const gained = Math.round((base + streakBonus + timeBonus) * diffMul);
+    const gained = Math.round(game.diff.score + (game.mode.timed ? Math.floor(game.timer*2) : 0));
     game.score += gained;
     game.streak++;
     game.bestStreak = Math.max(game.bestStreak, game.streak);
-    if(game.mode.hotseat){
-      if(game.turn===1) game.p1score += gained; else game.p2score += gained;
-    }
     $("score").textContent = game.score;
     $("qCard").classList.add("pulse");
     playTone(660,0.08); playTone(880,0.1,0.09);
@@ -518,36 +415,27 @@
 
   function showFeedback(correct){
     const q = game.current;
-    $("fbText").innerHTML = correct
-      ? `<span style="color:var(--good)">✅ Correct!</span>`
-      : `<span style="color:var(--bad)">❌ Not quite</span>`;
+    $("fbText").innerHTML = correct ? `<span style="color:var(--good)">✅ सही उत्तर!</span>` : `<span style="color:var(--bad)">❌ गलत उत्तर!</span>`;
     $("fbVerse").textContent = q.v ? "📖 "+q.v : "";
-    $("feedback").classList.remove("hidden");
+    $("feedback").classList.remove("hidden-force");
   }
 
   function nextQuestion(){
     state.totalQ++;
     if(game.lastCorrect) state.correctQ++;
     game.idx++;
-    if(game.mode.hotseat && !game.mode.survival){
-      game.turn = game.turn===1 ? 2 : 1;
-    }
     if(game.mode.survival && game.lives<=0) return endGame();
     if(game.idx >= game.qTot) return endGame();
     renderQuestion();
   }
 
-  // ============================================================
-  // 🛟 LIFELINES
-  // ============================================================
+  // LIFELINES
   function renderLifelines(){
     document.querySelectorAll("[data-life]").forEach(b=>{
       const k = b.dataset.life;
       const left = game.usedLifes[k]||0;
       b.disabled = left<=0 || game.busy || game.feedback;
       b.style.opacity = left<=0?0.4:1;
-      const labels = {fifty:"🎯 50/50 x"+left, hint:"💡 Hint x"+left, skip:"⏭️ Skip x"+left, audience:"👥 Audience x"+left};
-      b.textContent = labels[k];
     });
   }
   function useLifeline(k){
@@ -562,37 +450,19 @@
       playTone(520,0.08);
     } else if(k==="hint"){
       const correctBtn = opts.find(b=>+b.dataset.idx===q.a);
-      if(correctBtn){
-        correctBtn.animate([{boxShadow:"0 0 0 0 var(--accent)"},{boxShadow:"0 0 0 8px transparent"}],{duration:1200,iterations:2});
-      }
+      if(correctBtn) correctBtn.animate([{boxShadow:"0 0 0 0 var(--accent)"},{boxShadow:"0 0 0 8px transparent"}],{duration:1200,iterations:2});
       playTone(740,0.08);
     } else if(k==="skip"){
       game.busy = true;
       playTone(440,0.1);
       setTimeout(()=>{ game.idx++; renderQuestion(); },250);
-    } else if(k==="audience"){
-      const correctIdx = q.a;
-      opts.forEach(b=>{
-        const isRight = +b.dataset.idx===correctIdx;
-        const pct = isRight ? 55+Math.floor(Math.random()*30) : Math.floor(Math.random()*30);
-        const bar = document.createElement("div");
-        bar.style.cssText = `height:4px;background:var(--accent);border-radius:2px;margin-top:4px;width:${pct}%;transition:width .5s`;
-        const lbl = document.createElement("div");
-        lbl.style.cssText = "font-size:10px;color:var(--muted);font-weight:700";
-        lbl.textContent = pct+"%";
-        b.appendChild(lbl); b.appendChild(bar);
-      });
-      playTone(600,0.06); setTimeout(()=>playTone(800,0.06),70);
     }
   }
 
-  // ============================================================
-  // 🏁 END GAME
-  // ============================================================
+  // END GAME
   function endGame(){
     clearInterval(timerInt);
     state.games++;
-    const accuracy = state.totalQ>0 ? Math.round(state.correctQ/state.totalQ*100) : 0;
     const pct = game.qTot>0 ? Math.round(game.score/(game.qTot*game.diff.score*1.5)*100) : 0;
     const perfect = pct>=95;
     if(perfect) state.perfects++;
@@ -600,125 +470,64 @@
     if(selMode==="survival") state.bestSurvival = Math.max(state.bestSurvival, game.idx);
     if(selMode==="marathon") state.bestMarathon = Math.max(state.bestMarathon, game.idx);
     
-    const xpGain = game.score + (perfect?100:0) + (game.bestStreak*3);
+    const xpGain = game.score + (perfect?100:0);
     state.xp += xpGain;
     state.level = 1 + Math.floor(state.xp / 500);
     
-    if(game.daily){
-      const today = new Date().toDateString();
-      if(state.lastDaily!==today || game.score>state.bestDaily){
-        state.bestDaily = Math.max(state.bestDaily, game.score);
-        state.lastDaily = today;
-        state.dailyDone = true;
-      }
-    }
-    
     const newBadges = [];
-    BADGES.forEach(b=>{
-      if(!state.badges[b.id] && b.check(state)){ state.badges[b.id]=true; newBadges.push(b); }
-    });
-    save();
-    updatePlayerUI();
+    BADGES.forEach(b=>{ if(!state.badges[b.id] && b.check(state)){ state.badges[b.id]=true; newBadges.push(b); } });
+    save(); updatePlayerUI();
 
-    $("quiz").classList.add("hidden");
+    $("quiz").classList.add("hidden-force");
     const r = $("results");
-    r.classList.remove("hidden");
-    let hotseatHtml = "";
-    if(game.mode.hotseat){
-      const winner = game.p1score>game.p2score?"Player 1 🎉":game.p2score>game.p1score?"Player 2 🎉":"It's a Tie!";
-      hotseatHtml = `
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Player 1</p><p class="text-3xl font-extrabold">${game.p1score}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Player 2</p><p class="text-3xl font-extrabold">${game.p2score}</p></div>
-        </div>
-        <p class="text-center font-bold text-lg mb-4" style="background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent">${winner}</p>`;
-    }
+    r.classList.remove("hidden-force");
     r.innerHTML = `
-      <div class="card p-7 text-center fade-in">
-        <div class="text-6xl mb-2">${perfect?"🏆":game.mode.survival&&game.lives<=0?"💔":"🎊"}</div>
-        <h2 class="text-3xl font-extrabold mb-1" style="background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent">
-          ${perfect?"PERFECT!":game.mode.survival&&game.lives<=0?"Game Over":"Quiz Complete!"}
+      <div class="card p-8 text-center fade-in">
+        <div class="text-7xl mb-3">${perfect?"🏆":game.mode.survival&&game.lives<=0?"💔":"🎊"}</div>
+        <h2 class="text-4xl font-extrabold mb-3" style="background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent">
+          ${perfect?"उत्कृष्ट!":game.mode.survival&&game.lives<=0?"खेल समाप्त":"खेल पूरा भयो!"}
         </h2>
-        <p class="text-sm mb-5" style="color:var(--muted)">${game.mode.icon} ${game.mode.name}</p>
-        ${hotseatHtml}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Score</p><p class="text-2xl font-extrabold">${game.score}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Questions</p><p class="text-2xl font-extrabold">${game.idx}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Best Streak</p><p class="text-2xl font-extrabold streak">🔥 ${game.bestStreak}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">XP Gained</p><p class="text-2xl font-extrabold" style="color:var(--accent)">+${xpGain}</p></div>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="stat-box p-4 rounded-xl" style="background:var(--accent-soft)"><p class="text-sm font-bold text-gray-500">स्कोर</p><p class="text-3xl font-extrabold">${game.score}</p></div>
+          <div class="stat-box p-4 rounded-xl" style="background:var(--accent-soft)"><p class="text-sm font-bold text-gray-500">प्रश्नहरू</p><p class="text-3xl font-extrabold">${game.idx}</p></div>
         </div>
-        ${newBadges.length?`
-          <div class="mb-5 p-4 rounded-2xl" style="background:var(--accent-soft);border:1px solid var(--border)">
-            <p class="font-bold mb-2">🏆 New Achievement${newBadges.length>1?"s":""} Unlocked!</p>
-            <div class="flex flex-wrap gap-2 justify-center">${newBadges.map(b=>`<span class="chip active">${b.icon} ${b.name}</span>`).join("")}</div>
-          </div>`:""}
-        <div class="flex flex-wrap gap-2 justify-center">
-          <button class="btn btn-primary" onclick="window.__startSame()">🔁 Play Again</button>
-          <button class="btn btn-accent2" onclick="window.__menu()">🏠 Main Menu</button>
+        ${newBadges.length?`<div class="mb-5 p-4 rounded-2xl bg-purple-100 dark:bg-purple-900"><p class="font-bold text-lg mb-2">🏆 नयाँ ब्याज प्राप्त!</p></div>`:""}
+        <div class="flex flex-col gap-3">
+          <button class="btn btn-primary" onclick="window.__startSame()">🔁 फेरि खेल्नुहोस्</button>
+          <button class="btn btn-accent2" onclick="window.__menu()">🏠 मुख्य मेनु</button>
         </div>
       </div>`;
   }
-  window.__startSame = ()=>startGame(game.daily);
-  window.__menu = ()=>{ $("results").classList.add("hidden"); $("menu").classList.remove("hidden"); };
+  window.__startSame = ()=>startGame();
+  window.__menu = ()=>{ $("results").classList.add("hidden-force"); $("menu").classList.remove("hidden-force"); };
   function quitGame(){
-    if(!confirm("Quit this quiz? Your progress will be lost.")) return;
+    if(!confirm("के तपाई यो खेल छोड्न चाहनुहुन्छ?")) return;
     clearInterval(timerInt);
-    $("quiz").classList.add("hidden");
-    $("menu").classList.remove("hidden");
+    $("quiz").classList.add("hidden-force"); $("menu").classList.remove("hidden-force");
   }
 
-  // ============================================================
-  // 📊 STATS & BADGES
-  // ============================================================
+  // STATS & BADGES
   function showStats(){
-    const acc = state.totalQ>0?Math.round(state.correctQ/state.totalQ*100):0;
-    $("menu").classList.add("hidden");
-    const v = $("statsView"); v.classList.remove("hidden");
+    $("menu").classList.add("hidden-force"); const v = $("statsView"); v.classList.remove("hidden-force");
     v.innerHTML = `
-      <div class="card p-6 fade-in">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-2xl font-extrabold">📊 Your Statistics</h2>
-          <button class="btn btn-ghost" onclick="document.getElementById('statsView').classList.add('hidden');document.getElementById('menu').classList.remove('hidden')">← Back</button>
+      <div class="card p-6 fade-in flex-1">
+        <h2 class="text-3xl font-extrabold mb-6">📊 तथ्याङ्क</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="stat-box p-4 rounded-xl" style="background:var(--accent-soft)"><p class="text-sm font-bold">लेभल</p><p class="text-3xl font-extrabold">${state.level}</p></div>
+          <div class="stat-box p-4 rounded-xl" style="background:var(--accent-soft)"><p class="text-sm font-bold">खेलहरू</p><p class="text-3xl font-extrabold">${state.games}</p></div>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Level</p><p class="text-3xl font-extrabold">${state.level}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Total XP</p><p class="text-3xl font-extrabold" style="color:var(--accent)">${state.xp}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Quizzes</p><p class="text-3xl font-extrabold">${state.games}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Accuracy</p><p class="text-3xl font-extrabold" style="color:var(--good)">${acc}%</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Questions</p><p class="text-3xl font-extrabold">${state.totalQ}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Best Streak</p><p class="text-3xl font-extrabold streak">🔥 ${state.bestStreak}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Best Survival</p><p class="text-3xl font-extrabold">${state.bestSurvival}</p></div>
-          <div class="stat-box"><p class="text-xs" style="color:var(--muted)">Best Marathon</p><p class="text-3xl font-extrabold">${state.bestMarathon}</p></div>
-        </div>
-        <div class="mt-5 p-4 rounded-2xl" style="background:var(--accent-soft);border:1px solid var(--border)">
-          <p class="font-bold mb-1">🌟 Daily Challenge Best</p>
-          <p class="text-2xl font-extrabold">${state.bestDaily} pts</p>
-          <p class="text-xs" style="color:var(--muted)">${state.lastDaily||"Not yet played"}</p>
-        </div>
-        <div class="mt-4 flex gap-2">
-          <button class="btn btn-ghost" onclick="if(confirm('Reset ALL progress? This cannot be undone.')){localStorage.removeItem('${LS_KEY}');location.reload()}">🗑️ Reset Progress</button>
-        </div>
+        <button class="btn btn-primary w-full mt-auto" onclick="document.getElementById('statsView').classList.add('hidden-force');document.getElementById('menu').classList.remove('hidden-force')">← पछाडि</button>
       </div>`;
   }
   function showBadges(){
-    $("menu").classList.add("hidden");
-    const v = $("badgesView"); v.classList.remove("hidden");
-    const unlocked = BADGES.filter(b=>state.badges[b.id]).length;
+    $("menu").classList.add("hidden-force"); const v = $("badgesView"); v.classList.remove("hidden-force");
     v.innerHTML = `
-      <div class="card p-6 fade-in">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-2xl font-extrabold">🏆 Achievements <span class="text-sm font-normal" style="color:var(--muted)">(${unlocked}/${BADGES.length})</span></h2>
-          <button class="btn btn-ghost" onclick="document.getElementById('badgesView').classList.add('hidden');document.getElementById('menu').classList.remove('hidden')">← Back</button>
+      <div class="card p-6 fade-in flex-1">
+        <h2 class="text-3xl font-extrabold mb-6">🏆 ब्याजहरू</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          ${BADGES.map(b=>`<div class="card p-4 text-center ${state.badges[b.id]?"":"opacity-50 grayscale"}"><div class="text-4xl mb-2">${b.icon}</div><p class="font-bold text-lg">${b.name}</p></div>`).join("")}
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          ${BADGES.map(b=>`
-            <div class="card p-4 text-center ${state.badges[b.id]?"":"locked"}">
-              <div class="badge mx-auto mb-2">${b.icon}</div>
-              <p class="font-bold text-sm">${b.name}</p>
-              <p class="text-xs mt-1" style="color:var(--muted)">${b.desc}</p>
-              ${state.badges[b.id]?`<p class="text-[10px] mt-2 font-bold" style="color:var(--good)">✓ UNLOCKED</p>`:`<p class="text-[10px] mt-2" style="color:var(--muted)">🔒 Locked</p>`}
-            </div>`).join("")}
-        </div>
+        <button class="btn btn-primary w-full mt-auto" onclick="document.getElementById('badgesView').classList.add('hidden-force');document.getElementById('menu').classList.remove('hidden-force')">← पछाडि</button>
       </div>`;
   }
 
@@ -726,17 +535,12 @@
   function shuffleArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   function updatePlayerUI(){ $("xp").textContent=state.xp; $("plvl").textContent=state.level; }
   function showXP(text){
-    const r = $("qCard").getBoundingClientRect();
-    const el = document.createElement("div");
-    el.className = "xp-pop"; el.textContent = text;
-    el.style.left = (r.left+r.width/2)+"px"; el.style.top = (r.top+40)+"px";
+    const r = $("qCard").getBoundingClientRect(); const el = document.createElement("div");
+    el.className = "xp-pop"; el.textContent = text; el.style.left = (r.left+r.width/2)+"px"; el.style.top = (r.top+40)+"px";
     document.body.appendChild(el); setTimeout(()=>el.remove(),1000);
   }
   function toggleTheme(){ state.theme = state.theme==="light"?"dark":"light"; save(); applyTheme(); }
-  function applyTheme(){
-    document.documentElement.setAttribute("data-theme", state.theme);
-    $("themeBtn").textContent = state.theme==="light"?"🌙":"☀️";
-  }
+  function applyTheme(){ document.documentElement.setAttribute("data-theme", state.theme); $("themeBtn").textContent = state.theme==="light"?"🌙":"☀️"; }
   
   let audioCtx;
   function playTone(freq,dur,type="sine",delay=0){
@@ -753,10 +557,7 @@
   }
   
   const origNext = nextQuestion;
-  nextQuestion = function(){
-    game.lastCorrect = !!game.feedback && document.querySelector(".opt.correct") && !document.querySelector(".opt.wrong");
-    origNext();
-  };
+  nextQuestion = function(){ game.lastCorrect = !!game.feedback && document.querySelector(".opt.correct") && !document.querySelector(".opt.wrong"); origNext(); };
 })();
 </script>
 </body>
