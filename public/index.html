@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>नेपाली बाइबल क्विज</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #05010a 100%);
+            color: #fff; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: space-between;
+            overflow-x: hidden; touch-action: manipulation;
+        }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; background: rgba(0,0,0,0.85);
+            border-bottom: 3px solid #9d4edd; font-size: 1.2rem; font-weight: bold;
+        }
+        .stat-badge { background: #5a189a; padding: 8px 16px; border-radius: 20px; border: 1px solid #c77dff; }
+
+        .game-container {
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; padding: 20px; width: 100%; max-width: 900px; margin: auto;
+        }
+
+        .digital-timer {
+            font-size: 2rem; font-weight: bold; color: #ff9e00; margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 158, 0, 0.6);
+            background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 30px; border: 2px solid #ff9e00;
+        }
+
+        .question-chevron {
+            width: 100%; background: linear-gradient(135deg, #3c096c, #5a189a);
+            border: 3px solid #e0aaff; border-radius: 15px;
+            padding: 25px 20px; text-align: center; font-size: 1.6rem; font-weight: bold;
+            color: #ffffff; box-shadow: 0 0 30px rgba(199, 125, 255, 0.6);
+            margin-bottom: 25px; line-height: 1.5; word-break: break-word; min-height: 110px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; }
+
+        .option-btn {
+            background: linear-gradient(90deg, #1b003a, #3c096c);
+            border: 2px solid #9d4edd; color: #ffffff;
+            padding: 18px 22px; border-radius: 12px; font-size: 1.3rem;
+            text-align: left; cursor: pointer; font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            transition: all 0.2s ease; display: flex; align-items: center;
+            word-break: break-word; opacity: 0; transform: translateY(20px);
+            animation: fadeInOpt 0.4s forwards;
+        }
+        @keyframes fadeInOpt { to { opacity: 1; transform: translateY(0); } }
+        .option-btn span { color: #ff9e00; margin-right: 15px; font-size: 1.4rem; }
+        .option-btn:hover:not(:disabled) { background: linear-gradient(90deg, #5a189a, #7b2cbf); border-color: #ff9e00; }
+        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .correct-ans { background: #2a9d8f !important; border-color: #264653 !important; }
+        .wrong-ans { background: #e76f51 !important; border-color: #d90429 !important; }
+
+        .timer-container { width: 100%; background: #10002b; height: 12px; border-radius: 6px; border: 1px solid #9d4edd; margin-bottom: 20px; overflow: hidden; }
+        .timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #4cc9f0, #4361ee); transition: width 1s linear; }
+
+        .lifelines-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .lifeline-btn {
+            background: #3a0ca3; color: #fff; border: 2px solid #4cc9f0;
+            padding: 10px 16px; border-radius: 25px; font-weight: bold; cursor: pointer;
+            font-size: 1rem; box-shadow: 0 0 12px rgba(76, 201, 240, 0.5);
+        }
+        .lifeline-btn:disabled { opacity: 0.3; border-color: #555; cursor: not-allowed; }
+
+        .screen { display: none; width: 100%; text-align: center; }
+        .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #f72585, #b5179e); color: white;
+            border: none; padding: 18px 35px; font-size: 1.4rem; border-radius: 35px;
+            cursor: pointer; font-weight: bold; margin: 15px; width: 90%; max-width: 400px;
+            box-shadow: 0 6px 25px rgba(247, 37, 133, 0.6);
+        }
+
+        .verse-ref { margin-top: 20px; font-size: 1.3rem; color: #ffd166; font-style: italic; min-height: 30px; font-weight: bold; }
+        input { width: 90%; max-width: 400px; padding: 18px; border-radius: 12px; border: 2px solid #9d4edd; margin-bottom: 20px; font-size: 1.3rem; text-align: center; background: #240046; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar" id="statusBar" style="display: none;">
+        <div class="stat-badge" id="scoreDisplay">अंक: 0</div>
+        <div class="stat-badge" id="levelDisplay">प्र. 1/0</div>
+        <div class="stat-badge" id="streakDisplay">स्ट्रिक: 🔥0</div>
+    </div>
+
+    <!-- MENU -->
+    <div id="menuScreen" class="screen active">
+        <h1 style="font-size: 2.8rem; color: #f72585; text-shadow: 0 0 20px rgba(247,37,133,0.8); margin-bottom: 10px;">📖 नेपाली बाइबल क्विज</h1>
+        <p style="font-size: 1.3rem; color: #e0aaff; margin-bottom: 35px;">तपाईंको बाइबल ज्ञान परीक्षण गर्नुहोस्!</p>
+        <input type="text" id="playerName" placeholder="आफ्नो नाम लेख्नुहोस्..." value="खेलाडी">
+        <button class="menu-btn" onclick="fetchQuestionsAndStart()">खेल सुरु गर्नुहोस्</button>
+    </div>
+
+    <!-- GAME -->
+    <div id="gameScreen" class="screen">
+        <div class="game-container">
+            <div class="lifelines-bar">
+                <button class="lifeline-btn" id="ll50" onclick="use5050()">🎯 50/50</button>
+                <button class="lifeline-btn" id="llHint" onclick="useHint()">💡 Hint</button>
+                <button class="lifeline-btn" id="llSkip" onclick="useSkip()">⏭️ Skip</button>
+                <button class="lifeline-btn" id="llPoll" onclick="usePoll()">👥 Poll</button>
+            </div>
+
+            <div class="digital-timer" id="digitalTimer">⏳ 30 सेकेन्ड</div>
+            <div class="timer-container"><div class="timer-bar" id="timerBar"></div></div>
+            <div class="question-chevron" id="questionText">प्रश्न लोड हुँदैछ...</div>
+            <div class="options-grid" id="optionsContainer"></div>
+            <div class="verse-ref" id="verseRef"></div>
+        </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameOverScreen" class="screen">
+        <div class="game-container">
+            <h1 id="resultTitle" style="font-size: 2.8rem; color: #ffd166; margin-bottom: 15px;">खेल समाप्त!</h1>
+            <p id="resultDesc" style="font-size: 1.4rem; margin: 20px 0; line-height: 1.6;"></p>
+            <button class="menu-btn" onclick="returnToMenu()">मुख्य मेनुमा फर्कनुहोस्</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            if(type === 'correct') {
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if(type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if(type === 'tick') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            } else if(type === 'click') {
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+            }
+        }
+
+        let questionsDB = [];
+        let qIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let timer = null;
+        let timeLeft = 30;
+        let activeQuestions = [];
+        let lifelinesUsed = { '5050': false, hint: false, skip: false, poll: false };
+
+        async function fetchQuestionsAndStart() {
+            playSound('click');
+            try {
+                const res = await fetch('/api/questions');
+                questionsDB = await res.json();
+                if(questionsDB.length === 0) {
+                    alert("⚠️ एक्सेल फाइलमा कुनै प्रश्न भेटिएन!");
+                    return;
+                }
+                startGame();
+            } catch(e) {
+                alert("सर्भरबाट प्रश्न ल्याउन असफल भयो!");
+            }
+        }
+
+        function startGame() {
+            qIndex = 0;
+            score = 0;
+            streak = 0;
+            lifelinesUsed = { '5050': false, hint: false, skip: false, poll: false };
+            
+            activeQuestions = [...questionsDB].sort(() => Math.random() - 0.5);
+
+            document.getElementById('menuScreen').classList.remove('active');
+            document.getElementById('gameOverScreen').classList.remove('active');
+            document.getElementById('gameScreen').classList.add('active');
+            document.getElementById('statusBar').style.display = 'flex';
+
+            document.querySelectorAll('.lifeline-btn').forEach(btn => btn.disabled = false);
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(qIndex >= activeQuestions.length) {
+                endGame();
+                return;
+            }
+
+            const qData = activeQuestions[qIndex];
+            const qBox = document.getElementById('questionText');
+            const optContainer = document.getElementById('optionsContainer');
+            
+            qBox.innerText = "";
+            optContainer.innerHTML = "";
+            document.getElementById('verseRef').innerText = "";
+            document.getElementById('digitalTimer').innerText = `⏳ 30 सेकेन्ड`;
+            document.getElementById('timerBar').style.width = '100%';
+
+            updateStatsDisplay();
+
+            let fullText = `प्र. ${qIndex + 1}: ${qData.q}`;
+            let charIdx = 0;
+            
+            let typeInterval = setInterval(() => {
+                if(charIdx < fullText.length) {
+                    qBox.innerText += fullText.charAt(charIdx);
+                    charIdx++;
+                } else {
+                    clearInterval(typeInterval);
+                    showOptionsSmoothly(qData);
+                }
+            }, 30);
+        }
+
+        function showOptionsSmoothly(qData) {
+            const optContainer = document.getElementById('optionsContainer');
+            
+            qData.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.style.animationDelay = `${i * 0.15}s`;
+                btn.innerHTML = `<span>${String.fromCharCode(65 + i)}:</span> ${opt}`;
+                btn.onclick = () => selectAnswer(opt, btn);
+                optContainer.appendChild(btn);
+            });
+
+            setTimeout(() => {
+                startTimer();
+            }, qData.options.length * 150 + 200);
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            const timerBar = document.getElementById('timerBar');
+            const digitalTimer = document.getElementById('digitalTimer');
+            
+            timerBar.style.width = '100%';
+            timerBar.style.background = '#4cc9f0';
+
+            timer = setInterval(() => {
+                timeLeft--;
+                digitalTimer.innerText = `⏳ ${timeLeft} सेकेन्ड`;
+                playSound('tick');
+
+                let pct = (timeLeft / 30) * 100;
+                timerBar.style.width = pct + '%';
+                if(timeLeft <= 10) timerBar.style.background = '#e76f51';
+
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            playSound('wrong');
+            streak = 0;
+            highlightCorrectAndNext();
+        }
+
+        function selectAnswer(selectedOpt, btn) {
+            clearInterval(timer);
+            playSound('click');
+            const qData = activeQuestions[qIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const isCorrect = (selectedOpt.trim() === qData.correctText.trim());
+
+            if(isCorrect) {
+                btn.classList.add('correct-ans');
+                playSound('correct');
+                score += 10 + (timeLeft * 2);
+                streak++;
+            } else {
+                btn.classList.add('wrong-ans');
+                playSound('wrong');
+                streak = 0;
+                allBtns.forEach(b => {
+                    if(b.innerText.includes(qData.correctText)) {
+                        b.classList.add('correct-ans');
+                    }
+                });
+            }
+
+            document.getElementById('verseRef').innerText = `📖 बाइबल सन्दर्भ: ${qData.ref}`;
+            setTimeout(() => {
+                qIndex++;
+                loadQuestion();
+            }, 3500);
+        }
+
+        function highlightCorrectAndNext() {
+            const qData = activeQuestions[qIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => {
+                if(b.innerText.includes(qData.correctText)) {
+                    b.classList.add('correct-ans');
+                }
+            });
+            document.getElementById('verseRef').innerText = `📖 बाइबल सन्दर्भ: ${qData.ref}`;
+
+            setTimeout(() => {
+                qIndex++;
+                loadQuestion();
+            }, 3500);
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('scoreDisplay').innerText = `अंक: ${score}`;
+            document.getElementById('levelDisplay').innerText = `प्र. ${qIndex + 1}/${activeQuestions.length}`;
+            document.getElementById('streakDisplay').innerText = `स्ट्रिक: 🔥${streak}`;
+        }
+
+        function use5050() {
+            if(lifelinesUsed['5050']) return;
+            lifelinesUsed['5050'] = true;
+            document.getElementById('ll50').disabled = true;
+            playSound('click');
+
+            const qData = activeQuestions[qIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+            let removedCount = 0;
+            allBtns.forEach((btn) => {
+                if(!btn.innerText.includes(qData.correctText) && removedCount < 2) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.2';
+                    removedCount++;
+                }
+            });
+        }
+
+        function useHint() {
+            if(lifelinesUsed.hint) return;
+            lifelinesUsed.hint = true;
+            document.getElementById('llHint').disabled = true;
+            playSound('click');
+
+            const qData = activeQuestions[qIndex];
+            alert(`💡 संकेत: यो प्रश्न '${qData.ref}' सन्दर्भसँग सम्बन्धित छ!`);
+        }
+
+        function useSkip() {
+            if(lifelinesUsed.skip) return;
+            lifelinesUsed.skip = true;
+            document.getElementById('llSkip').disabled = true;
+            clearInterval(timer);
+            playSound('click');
+            qIndex++;
+            loadQuestion();
+        }
+
+        function usePoll() {
+            if(lifelinesUsed.poll) return;
+            lifelinesUsed.poll = true;
+            document.getElementById('llPoll').disabled = true;
+            playSound('click');
+
+            alert(`👥 दर्शकहरूको राय: बहुमत सही उत्तरको पक्षमा देखिएको छ!`);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('statusBar').style.display = 'none';
+            document.getElementById('gameOverScreen').classList.add('active');
+
+            document.getElementById('resultTitle').innerText = "🎉 खेल समाप्त भयो!";
+            document.getElementById('resultDesc').innerHTML = `तपाईंको कुल स्कोर: <b style="color: #ffd166; font-size: 1.6rem;">${score} अंक</b><br>तपाईंको बाइबल ज्ञान उत्कृष्ट रहेको छ!`;
+        }
+
+        function returnToMenu() {
+            playSound('click');
+            document.getElementById('gameOverScreen').classList.remove('active');
+            document.getElementById('menuScreen').classList.add('active');
+        }
+    </script>
+</body>
+</html>
