@@ -2,18 +2,72 @@
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>होस्ट प्यानल</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>होस्ट कन्ट्रोल प्यानल</title>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #16213e; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+        h1 { text-align: center; color: #e94560; }
+        .scoreboard { display: flex; gap: 10px; flex-wrap: wrap; background: #0f3460; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .team-badge { background: #e94560; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        .question-list { max-height: 400px; overflow-y: auto; background: #1a1a2e; padding: 15px; border-radius: 8px; border: 1px solid #0f3460; }
+        .q-item { display: flex; justify-content: space-between; align-items: center; background: #0f3460; padding: 12px; margin-bottom: 10px; border-radius: 6px; }
+        .q-item span { width: 75%; font-size: 1.1em; }
+        button { background: #e94560; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { background: #ff6b81; }
+    </style>
 </head>
 <body>
-    <div class="container host-panel">
-        <h1>🎮 होस्ट ड्यासबोर्ड</h1>
-        <div id="scoreboard" class="scoreboard"></div>
-        <hr>
-        <button onclick="sendNextQuestion()" class="btn-host">अर्को प्रश्न पठाउनुहोस् ➔</button>
+    <div class="container">
+        <h1>🎮 होस्ट कन्ट्रोल ड्यासबोर्ड</h1>
+        <h3>प्रतियोगीहरूको लाइभ स्कोर:</h3>
+        <div id="scoreboard" class="scoreboard">जडान भएका टिमहरू छैनन्...</div>
+        
+        <hr style="border-color: #0f3460; margin: 20px 0;">
+        
+        <h3>प्रश्न चयन गर्नुहोस् (Select Question):</h3>
+        <div id="question-list" class="question-list">प्रश्नहरू लोड हुँदैछन्...</div>
     </div>
-    <script src="js/host.js"></script>
+
+    <script>
+        const socket = io();
+
+        socket.emit('get_host_data');
+
+        socket.on('update_scoreboard', (teams) => {
+            const sb = document.getElementById('scoreboard');
+            sb.innerHTML = '';
+            if (Object.keys(teams).length === 0) {
+                sb.innerHTML = 'अझै कोही टिम जोडीएका छैनन्।';
+                return;
+            }
+            for(let id in teams) {
+                sb.innerHTML += `<div class="team-badge">🏆 ${teams[id].name}: ${teams[id].score}</div>`;
+            }
+        });
+
+        socket.on('load_question_list', (questions) => {
+            const listDiv = document.getElementById('question-list');
+            listDiv.innerHTML = '';
+            
+            if(questions.length === 0) {
+                listDiv.innerHTML = '<p>कुनै प्रश्न फेला परेन!</p>';
+                return;
+            }
+
+            questions.forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'q-item';
+                item.innerHTML = `<span><b>प्र. ${index + 1}:</b> ${q.q}</span> <button onclick="sendQuestion(${index})">यो प्रश्न पठाउनुहोस् ➔</button>`;
+                listDiv.appendChild(item);
+            });
+        });
+
+        function sendQuestion(index) {
+            socket.emit('host_select_question', index);
+            alert("प्रश्न सफलतापूर्वक सबै प्रतियोगीहरूको मोबाइलमा पठाइयो!");
+        }
+    </script>
 </body>
 </html>
-
