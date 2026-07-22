@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बाइबल क्विज</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="scoreboard" class="scoreboard"></div>
+
+    <div id="register-screen" class="container">
+        <h1>आफ्नो टिमको नाम राख्नुहोस्</h1>
+        <input type="text" id="teamName" placeholder="जस्तै: दाऊदको सेना">
+        <button onclick="registerTeam()">खेल्न सुरु गर्नुहोस्</button>
+    </div>
+
+    <div id="game-screen" class="container" style="display: none;">
+        <h2 id="question-text">होस्टले प्रश्न पठाउनुहुनेछ...</h2>
+        <div id="options-container" class="options-grid"></div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="js/client.js"></script>
+</body>
+</html>
