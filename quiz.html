@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>कौनेस बनेगा बाइबल क्विज</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #240046 0%, #10002b 100%);
+            color: #fff; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: space-between;
+            overflow-x: hidden; touch-action: manipulation;
+        }
+
+        /* Top Bar & Stats */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 20px; background: rgba(0,0,0,0.5);
+            border-bottom: 2px solid #7b2cbf; font-size: 1.1rem;
+        }
+        .stat-badge { background: #5a189a; padding: 6px 12px; border-radius: 20px; border: 1px solid #9d4edd; font-weight: bold; }
+
+        /* Main Container */
+        .game-container {
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; padding: 15px; width: 100%; max-width: 800px; margin: auto;
+        }
+
+        /* KBC Style Question Box */
+        .question-chevron {
+            width: 100%; background: linear-gradient(135deg, #3c096c, #5a189a);
+            border: 3px solid #c77dff; border-radius: 12px;
+            padding: 22px; text-align: center; font-size: 1.4rem; font-weight: bold;
+            color: #ffffff; box-shadow: 0 0 25px rgba(199, 125, 255, 0.5);
+            margin-bottom: 30px; position: relative; line-height: 1.4;
+        }
+        .question-chevron::before, .question-chevron::after {
+            content: ''; position: absolute; top: 50%; width: 15px; height: 100%;
+            background: #e0aaff; transform: translateY(-50%);
+        }
+
+        /* Options Grid (KBC Hexagon/Chevron Style) */
+        .options-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
+        }
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .option-btn {
+            background: linear-gradient(90deg, #240046, #3c096c);
+            border: 2px solid #9d4edd; color: #ffffff;
+            padding: 18px 20px; border-radius: 10px; font-size: 1.2rem;
+            text-align: left; cursor: pointer; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: all 0.2s ease; display: flex; align-items: center;
+        }
+        .option-btn span { color: #ff9e00; margin-right: 12px; font-size: 1.3rem; }
+        .option-btn:hover:not(:disabled) {
+            background: linear-gradient(90deg, #5a189a, #7b2cbf);
+            border-color: #ff9e00; transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 158, 0, 0.6);
+        }
+        .option-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* States */
+        .correct-ans { background: #2a9d8f !important; border-color: #264653 !important; animation: pulse 0.5s infinite alternate; }
+        .wrong-ans { background: #e76f51 !important; border-color: #d90429 !important; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.03); }
+        }
+
+        /* Timer Bar */
+        .timer-container { width: 100%; background: #240046; height: 12px; border-radius: 6px; border: 1px solid #7b2cbf; margin-bottom: 25px; overflow: hidden; }
+        .timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #4cc9f0, #4361ee); transition: width 1s linear; }
+
+        /* Lifelines Bar */
+        .lifelines-bar {
+            display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .lifeline-btn {
+            background: #3a0ca3; color: #fff; border: 2px solid #4cc9f0;
+            padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer;
+            font-size: 1rem; box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+        }
+        .lifeline-btn:hover:not(:disabled) { background: #4361ee; }
+        .lifeline-btn:disabled { opacity: 0.4; border-color: #555; cursor: not-allowed; }
+
+        /* Screens & Modals */
+        .screen { display: none; width: 100%; text-align: center; }
+        .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #f72585, #b5179e); color: white;
+            border: none; padding: 16px 30px; font-size: 1.3rem; border-radius: 30px;
+            cursor: pointer; font-weight: bold; margin: 10px; width: 85%; max-width: 350px;
+            box-shadow: 0 5px 20px rgba(247, 37, 133, 0.5); transition: 0.2s;
+        }
+        .menu-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(247, 37, 133, 0.8); }
+
+        /* Reference Footer */
+        .verse-ref {
+            margin-top: 15px; font-size: 1.1rem; color: #ffd166; font-style: italic; min-height: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Status Bar -->
+    <div class="top-bar" id="statusBar" style="display: none;">
+        <div class="stat-badge" id="scoreDisplay">अंक: 0</div>
+        <div class="stat-badge" id="levelDisplay">स्तर: 1</div>
+        <div class="stat-badge" id="streakDisplay">स्ट्रिक: 🔥0</div>
+    </div>
+
+    <!-- MAIN MENU SCREEN -->
+    <div id="menuScreen" class="screen active">
+        <h1 style="font-size: 2.5rem; color: #f72585; text-shadow: 0 0 15px rgba(247,37,133,0.7); margin-bottom: 10px;">👑 बाइबल क्विज महामुकाबला</h1>
+        <p style="font-size: 1.2rem; color: #e0aaff; margin-bottom: 30px;">कौनेस बनेगा करोडपति शैलीमा सोलो खेल र ज्ञान बढाउनुहोस्!</p>
+        <button class="menu-btn" onclick="startGame('classic')">📖 क्लासिक मोड (१० प्रश्न)</button>
+        <button class="menu-btn" onclick="startGame('lightning')">⚡ लाइटनिङ मोड (३० सेकेन्ड तीव्र)</button>
+        <button class="menu-btn" onclick="startGame('survival')">❤️ सर्भाइवल मोड (३ ज्यान)</button>
+        <button class="menu-btn" onclick="openStats()">📊 तथ्याङ्क (Stats)</button>
+    </div>
+
+    <!-- GAMEPLAY SCREEN -->
+    <div id="gameScreen" class="screen">
+        <div class="game-container">
+            <!-- Lifelines -->
+            <div class="lifelines-bar">
+                <button class="lifeline-btn" id="ll50" onclick="use5050()">🎯 50/50</button>
+                <button class="lifeline-btn" id="llHint" onclick="useHint()">💡 Hint</button>
+                <button class="lifeline-btn" id="llSkip" onclick="useSkip()">⏭️ Skip</button>
+                <button class="lifeline-btn" id="llPoll" onclick="usePoll()">👥 Audience Poll</button>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-container">
+                <div class="timer-bar" id="timerBar"></div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="question-chevron" id="questionText">प्रश्न यहाँ आउनेछ...</div>
+
+            <!-- Options -->
+            <div class="options-grid" id="optionsContainer">
+                <!-- Options injected via JS -->
+            </div>
+
+            <!-- Bible Reference -->
+            <div class="verse-ref" id="verseRef"></div>
+        </div>
+    </div>
+
+    <!-- STATS / GAME OVER SCREEN -->
+    <div id="gameOverScreen" class="screen">
+        <div class="game-container">
+            <h1 id="resultTitle" style="font-size: 2.5rem; color: #ffd166;">खेल समाप्त!</h1>
+            <p id="resultDesc" style="font-size: 1.3rem; margin: 20px 0;"></p>
+            <button class="menu-btn" onclick="returnToMenu()">🏠 मुख्य मेनुमा फर्कनुहोस्</button>
+        </div>
+    </div>
+
+    <!-- Web Audio & Game Logic -->
+    <script>
+        // साउन्ड इफेक्ट्स (Web Audio API - कुनै फाइल नचाहिने)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            if(type === 'correct') {
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if(type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if(type === 'click') {
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+            }
+        }
+
+        // बाइबल प्रश्नहरूको भण्डार (तपाईंको एक्सेल प्रश्नहरू समेत समेटिएको)
+        const questionsDB = [
+            { q: "आदिमा परमेश्वरले के सृष्टि गर्नुभयो?", options: ["हवा र जमिन", "आकाशमण्डल र पृथ्वी", "मानिस र पशु", "पानी र आगो"], correct: 1, ref: "उत्पत्ति १:१" },
+            { q: "पृथ्वी कस्तो थियो जब परमेश्वरले सृष्टि गर्नुभयो?", options: ["धुलो र पत्थर", "सुन्दर र हरियो", "आकारविनाको र शून्य", "पानी र माटो"], correct: 2, ref: "उत्पत्ति १:२" },
+            { q: "परमेश्वरले पहिलो दिन के भन्नुभयो?", options: ["हवा होस्", "उज्यालो होस्", "अन्धकार होस्", "पानी होस्"], correct: 1, ref: "उत्पत्ति १:३" },
+            { q: "परमेश्वरले उज्यालो र अंधकारलाई के नाम दिनुभयो?", options: ["हवा र जमिन", "सूर्य र चन्द्रमा", "पानी र आगो", "दिन र रात"], correct: 3, ref: "उत्पत्ति १:५" },
+            { q: "परमेश्वरले मानिसलाई केबाट बनाउनुभयो?", options: ["रूखको हाँगा", "भुइँको माटो", "सुन र चाँदी", "हावा र पानी"], correct: 1, ref: "उत्पत्ति २:७" },
+            { q: "दाऊदले गोल्यतलाई केले हानेर लडाए?", options: ["तरवार", "भाला", "घुँयेत्रो र ढुङ्गा", "धनुष र बाण"], correct: 2, ref: "१ शमूएल १७:४९" },
+            { q: "भजनसंग्रह २३:१ अनुसार, 'परमप्रभु मेरो ______ हुनुहुन्छ'?", options: ["राजा", "पिता", "गोठाला", "मित्र"], correct: 2, ref: "भजनसंग्रह २३:१" },
+            { q: "मानिस केबल रोटीले मात्र बाँच्दैन, तर केले बाँच्छ?", options: ["धनसम्पत्तिले", "परमेश्वरको मुखबाट निस्केको हरेक वचनले", "आफ्नो बुद्धिले", "असल कामले"], correct: 1, ref: "मत्ती ४:४" },
+            { q: "नयाँ नियममा जम्मा कतिवटा पुस्तकहरू छन्?", options: ["२७", "३९", "६६", "१२"], correct: 0, ref: "बाइबल तथ्याङ्क" },
+            { q: "प्रभु येशू ख्रीष्ट कहाँ जन्मनुभएको थियो?", options: ["नासरत", "यसूलम", "बेथलेहेम", "मिश्र"], correct: 2, ref: "मत्ती २:१" }
+        ];
+
+        let currentMode = 'classic';
+        let qIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let lives = 3;
+        let timer = null;
+        let timeLeft = 30;
+        let activeQuestions = [];
+        let lifelinesUsed = { '5050': false, hint: false, skip: false, poll: false };
+
+        function startGame(mode) {
+            playSound('click');
+            currentMode = mode;
+            qIndex = 0;
+            score = 0;
+            streak = 0;
+            lives = 3;
+            lifelinesUsed = { '5050': false, hint: false, skip: false, poll: false };
+            
+            // Shuffle questions
+            activeQuestions = [...questionsDB].sort(() => Math.random() - 0.5);
+            if(mode === 'classic') activeQuestions = activeQuestions.slice(0, 10);
+
+            document.getElementById('menuScreen').classList.remove('active');
+            document.getElementById('gameOverScreen').classList.remove('active');
+            document.getElementById('gameScreen').classList.add('active');
+            document.getElementById('statusBar').style.display = 'flex';
+
+            // Reset Lifelines buttons
+            document.querySelectorAll('.lifeline-btn').forEach(btn => btn.disabled = false);
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(qIndex >= activeQuestions.length) {
+                endGame(true);
+                return;
+            }
+
+            const qData = activeQuestions[qIndex];
+            document.getElementById('questionText').innerText = `प्र. ${qIndex + 1}: ${qData.q}`;
+            document.getElementById('verseRef').innerText = "";
+
+            const optContainer = document.getElementById('optionsContainer');
+            optContainer.innerHTML = '';
+
+            qData.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${String.fromCharCode(65 + i)}:</span> ${opt}`;
+                btn.onclick = () => selectAnswer(i, btn);
+                optContainer.appendChild(btn);
+            });
+
+            updateStatsDisplay();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            const timerBar = document.getElementById('timerBar');
+            timerBar.style.width = '100%';
+            timerBar.style.background = '#4cc9f0';
+
+            timer = setInterval(() => {
+                timeLeft--;
+                let pct = (timeLeft / 30) * 100;
+                timerBar.style.width = pct + '%';
+                if(timeLeft <= 10) timerBar.style.background = '#e76f51';
+
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            playSound('wrong');
+            streak = 0;
+            if(currentMode === 'survival') {
+                lives--;
+                if(lives <= 0) { endGame(false); return; }
+            }
+            highlightCorrectAndNext();
+        }
+
+        function selectAnswer(selectedIndex, btn) {
+            clearInterval(timer);
+            playSound('click');
+            const qData = activeQuestions[qIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if(selectedIndex === qData.correct) {
+                btn.classList.add('correct-ans');
+                playSound('correct');
+                score += 10 + (timeLeft * 2); // Speed bonus
+                streak++;
+            } else {
+                btn.classList.add('wrong-ans');
+                allBtns[qData.correct].classList.add('correct-ans');
+                playSound('wrong');
+                streak = 0;
+                if(currentMode === 'survival') {
+                    lives--;
+                    if(lives <= 0) { setTimeout(() => endGame(false), 1500); return; }
+                }
+            }
+
+            document.getElementById('verseRef').innerText = `📖 बाइबल सन्दर्भ: ${qData.ref}`;
+            setTimeout(() => {
+                qIndex++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function highlightCorrectAndNext() {
+            const qData = activeQuestions[qIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns[qData.correct].classList.add('correct-ans');
+            document.getElementById('verseRef').innerText = `📖 बाइबल सन्दर्भ: ${qData.ref}`;
+
+            setTimeout(() => {
+                qIndex++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('scoreDisplay').innerText = `अंक: ${score}`;
+            document.getElementById('levelDisplay').innerText = `प्र. ${qIndex + 1}/${activeQuestions.length}`;
+            document.getElementById('streakDisplay').innerText = `स्ट्रिक: 🔥${streak}`;
+        }
+
+        // Lifelines Logic
+        function use5050() {
+            if(lifelinesUsed['5050']) return;
+            lifelinesUsed['5050'] = true;
+            document.getElementById('ll50').disabled = true;
+            playSound('click');
+
+            const qData = activeQuestions[qIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+            let removedCount = 0;
+            allBtns.forEach((btn, i) => {
+                if(i !== qData.correct && removedCount < 2) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.2';
+                    removedCount++;
+                }
+            });
+        }
+
+        function useHint() {
+            if(lifelinesUsed.hint) return;
+            lifelinesUsed.hint = true;
+            document.getElementById('llHint').disabled = true;
+            playSound('click');
+
+            const qData = activeQuestions[qIndex];
+            alert(`💡 संकेत: यो प्रश्न मुख्यतया '${qData.ref.split(' ')[0]}' पुस्तकसँग सम्बन्धित छ!`);
+        }
+
+        function useSkip() {
+            if(lifelinesUsed.skip) return;
+            lifelinesUsed.skip = true;
+            document.getElementById('llSkip').disabled = true;
+            clearInterval(timer);
+            playSound('click');
+            qIndex++;
+            loadQuestion();
+        }
+
+        function usePoll() {
+            if(lifelinesUsed.poll) return;
+            lifelinesUsed.poll = true;
+            document.getElementById('llPoll').disabled = true;
+            playSound('click');
+
+            const qData = activeQuestions[qIndex];
+            let correctOptLetter = String.fromCharCode(65 + qData.correct);
+            alert(`👥 दर्शकहरूको राय:\nअतिरिक्त बहुमत '${correctOptLetter}' विकल्पमा देखिएको छ!`);
+        }
+
+        function endGame(isWin) {
+            clearInterval(timer);
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('statusBar').style.display = 'none';
+            document.getElementById('gameOverScreen').classList.add('active');
+
+            const title = document.getElementById('resultTitle');
+            const desc = document.getElementById('resultDesc');
+
+            if(isWin) {
+                title.innerText = "🎉 बधाई छ! तपाईंले जिते 👑";
+                desc.innerHTML = `तपाईंको कुल स्कोर: <b>${score} अंक</b><br>बाइबल ज्ञान उत्कृष्ट रहेको छ!`;
+            } else {
+                title.innerText = "❌ खेल समाप्त भयो";
+                desc.innerHTML = `तपाईंको जम्मा स्कोर: <b>${score} अंक</b><br>फेरि प्रयास गर्नुहोस्!`;
+            }
+        }
+
+        function returnToMenu() {
+            playSound('click');
+            document.getElementById('gameOverScreen').classList.remove('active');
+            document.getElementById('menuScreen').classList.add('active');
+        }
+    </script>
+</body>
+</html>
