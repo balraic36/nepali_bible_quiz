@@ -10,15 +10,16 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// एक्सेल फाइलबाट प्रश्नहरू तान्ने (Load Questions)
+// CSV फाइलबाट प्रश्नहरू तान्ने (Load Questions)
 let questionPool = [];
 try {
-    const workbook = xlsx.readFile('./data/बाइबल_NNRV_Bible_Questions_Master.xlsx');
+    // यहाँ फाइलको नाम मिलाइएको छ!
+    const workbook = xlsx.readFile('./questions.csv');
     const sheet_name_list = workbook.SheetNames;
     questionPool = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
     console.log(`✅ ${questionPool.length} वटा प्रश्नहरू लोड भए!`);
 } catch (err) {
-    console.error("❌ एक्सेल फाइल भेटिएन वा पढ्न सकिएन!", err);
+    console.error("❌ CSV फाइल भेटिएन वा पढ्न सकिएन!", err);
 }
 
 // Game State
