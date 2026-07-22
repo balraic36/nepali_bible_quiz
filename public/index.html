@@ -3,26 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>बाइबल क्विज</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>बाइबल क्विज प्रतियोगिता</title>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff; margin: 0; padding: 10px;
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .header-score {
+            background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 8px;
+            text-align: center; font-size: 1.1em; border: 1px solid #f39c12; margin-bottom: 10px;
+        }
+        .container {
+            width: 100%; max-width: 650px; margin: auto; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 { text-align: center; color: #f1c40f; margin-top: 5px; }
+        input {
+            width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #ccc;
+            margin-bottom: 15px; font-size: 18px; text-align: center; background: #fff; color: #333;
+        }
+        .btn-main {
+            background: #e67e22; color: white; border: none; padding: 15px;
+            border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold;
+        }
+        .btn-main:hover { background: #d35400; }
+        
+        /* KBC Style Question & Options */
+        .question-box {
+            font-size: 1.4em; font-weight: bold; text-align: center; margin-bottom: 25px;
+            color: #f39c12; line-height: 1.4; word-break: break-word;
+        }
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn {
+            background: linear-gradient(90deg, #1e3c72, #2a5298); color: white; border: 2px solid #3498db;
+            padding: 14px 20px; border-radius: 10px; font-size: 1.1em; text-align: left; cursor: pointer;
+            transition: all 0.2s; word-break: break-word; font-weight: 500;
+        }
+        .option-btn:hover:not(:disabled) { background: linear-gradient(90deg, #2a5298, #3498db); border-color: #f1c40f; transform: scale(1.01); }
+        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        /* Correct / Wrong States */
+        .correct { background: #27ae60 !important; border-color: #2ecc71 !important; }
+        .wrong { background: #c0392b !important; border-color: #e74c3c !important; }
+
+        #alert-box {
+            text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 15px; padding: 10px; border-radius: 8px; display: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="scoreboard" class="scoreboard"></div>
 
+    <div class="header-score" id="scoreboard">स्कोरबोर्ड लोड हुँदैछ...</div>
+
+    <!-- Registration Screen -->
     <div id="register-screen" class="container">
-        <h1>आफ्नो टिमको नाम राख्नुहोस्</h1>
-        <input type="text" id="teamName" placeholder="जस्तै: दाऊदको सेना">
-        <button onclick="registerTeam()">खेल्न सुरु गर्नुहोस्</button>
+        <h1>📖 बाइबल क्विज</h1>
+        <p style="text-align: center; color: #ddd;">तपाईंको टिमको नाम राखेर खेलमा सहभागी हुनुहोस्</p>
+        <input type="text" id="teamName" placeholder="जस्तै: एलीयाको समूह">
+        <button class="btn-main" onclick="registerTeam()">सहभागी हुनुहोस्</button>
     </div>
 
+    <!-- Game Screen -->
     <div id="game-screen" class="container" style="display: none;">
-        <h2 id="question-text">होस्टले प्रश्न पठाउनुहुनेछ...</h2>
+        <div class="question-box" id="question-text">होस्टले प्रश्न छान्दै हुनुहुन्छ... कृपया पर्खनुहोस्!</div>
         <div id="options-container" class="options-grid"></div>
+        <div id="alert-box"></div>
     </div>
 
-    <div id="toast"></div>
+    <footer></footer>
 
-    <script src="js/client.js"></script>
+    <script>
+        const socket = io();
+
+        function registerTeam() {
+            const name = document.getElementById('teamName').value.trim();
+            if(name) {
+                socket.emit('register_team', name);
+            } else {
+                alert("कृपया टिमको नाम लेख्नुहोस्!");
+            }
+        }
+
+        socket.on('registration_success', () => {
+            document.getElementById('register-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+        });
+
+        socket.on('update_scoreboard', (teams) => {
+            let html = '<b>🏆 स्कोरबोर्ड:</b> ';
+            for(let id in teams) {
+                html += `<span style="margin-left:15px; background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px;">${teams[id].name}: <b>${teams[id].score}</b></span>`;
+            }
+            document.getElementById('scoreboard').innerHTML = html;
+        });
+
+        // होस्टले प्रश्न पठाउँदा सबैको स्क्रिनमा एकैसाथ आउने
+        socket.on('receive_question', (data) => {
+            const qText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const alertBox = document.getElementById('alert-box');
+            
+            alertBox.style.display = 'none';
+            qText.innerHTML = data.q;
+            optionsContainer.innerHTML = '';
+            
+            data.options.forEach(opt => {
+                if(opt) {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        // उत्तर थिच्नेबित्तिकै सबै अप्सन लक गर्ने (पहिले थिच्नेको मात्र मान्य हुने)
+                        const allBtns = document.querySelectorAll('.option-btn');
+                        allBtns.forEach(b => b.disabled = true);
+                        
+                        socket.emit('submit_answer', opt);
+                    };
+                    optionsContainer.appendChild(btn);
+                }
+            });
+        });
+
+        // कोही प्रतियोगीले सहि उत्तर मिलाउँदा
+        socket.on('answer_result', (data) => {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.style.display = 'block';
+            
+            if(data.isCorrect) {
+                alertBox.style.background = 'rgba(39, 174, 96, 0.8)';
+                alertBox.innerHTML = `🎉 ${data.teamName} ले सबैभन्दा पहिले सहि उत्तर दिनुभयो! <br><small style="color: #f1c40f;">सन्दर्भ: ${data.ref}</small>`;
+            }
+        });
+
+        // गलत उत्तर दिँदा व्यक्तिगत रूपमा माइनस अंक देखाउने
+        socket.on('wrong_answer_personal', (data) => {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'rgba(192, 57, 43, 0.8)';
+            alertBox.innerHTML = `❌ गलत उत्तर! तपाईंको ${data.penalty} अंक घट्यो। अर्को प्रश्नको प्रतीक्षा गर्नुहोस्।`;
+        });
+    </script>
 </body>
 </html>
